@@ -1,0 +1,45 @@
+---
+title: "multi_homework10"
+author: "Mikala"
+date: "February 15, 2016"
+output: word_document
+---
+
+
+```{r}
+library(vegan)
+data(dune)
+data("dune.env")
+dune_mds = metaMDS(dune)
+plot(dune_mds, type='n')
+text(dune_mds, 'sp', cex=.5)
+color_vect = rev(terrain.colors(6))[-1]
+points(dune_mds, 'sites', pch=19, 
+       col=color_vect[dune.env$Moisture])
+legend('topright', paste("Moisture =", 1:5, sep=''), 
+       col=color_vect, pch=19)
+# The goal of creating this plot is to look at trends of how amounts of moisture are related. The plot shows that species with similar amounts of moisture plot along similar axies in the plot, indicating that moisture is potentially a significant predictive variable
+dune_cca = cca(dune ~ dune.env$A1 + dune.env$Moisture + dune.env$Management + dune.env$Use + dune.env$Manure)
+dune_cca
+plot(dune_cca, type='n')
+text(dune_cca, 'sp', cex=.5)
+color_vect = rev(terrain.colors(6))[-1]
+points(dune_cca, 'sites', pch=19, 
+       col=color_vect[dune.env$Moisture])
+legend('topright', paste("Moisture =", 1:5, sep=''), 
+       col=color_vect, pch=19)
+dune_cca
+1.5032 / 2.1153
+# R-squared value for entire model (0.7106) Indicates that the model explains a relatively high amount of the variance
+plot(dune_cca, ylim=c(-20, 20), display=c('sp','bp'), scaling=1)
+anova(dune_cca)
+# P-value for the entire cca model (0.025) also indicates the model is significant 
+anova(dune_cca, by='margin')
+# gives P values for each factor included in model. Soil moisture and soil depth are the best predictive varioables, although the P-values are above the significance level
+a1_partial= cca(residuals(cca(dune ~ . - A1, data=dune.env)) ~ dune.env$A1)
+a1_partial
+0.05013 / 0.72280
+# R-squared value (0.0694) for cca model with all factors except A1 (thickness of soil A1 horizon), R-squared value indicates that the model can explain much less of the variance without taking A1 into consideration
+# The two analyses seem to complement each other with regards to identifying moisutre as a potentially important variable in explaining dune vegetation growth. Both plots portray the different levels of moisture plotting in groups along the same axes, and the CCA model analysis showed that moisture was one of the best explanatory variables in the model. However, further analysis of the CCA approach also identified A1 to be an important explanatory variable, since the model did a much worse job when it was removed. I find the direct ordination analysis to be more useful, since I feel it better explained relationships and predictive strengths of the included variables and provided a better analysis of the model as a whole.
+```
+
